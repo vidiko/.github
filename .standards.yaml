@@ -1,0 +1,67 @@
+---
+version: 1
+repository:
+  owner: vidiko
+  name: .github
+  visibility: ""
+  description: ""
+  homepage: ""
+  topics: []
+# Organisation community health files (CONTRIBUTING, pull request template, security policy) stay as the
+# organisation wrote them; adoption writes none of them here (answer praetor-adoption-dotgithub).
+adoption:
+  decline:
+    - contributing
+    - pull-request-template
+    - security-policy
+profiles:
+  - template-seed
+facets:
+  - security:high
+  - agent:sandboxed
+# Solo-maintained organisation repository: one maintainer, no second reviewer; the operator's bypass stays at
+# pull-request mode (standing solo-repository ruleset policy, owner-approved 2026-10-09).
+overrides:
+  branch_protection:
+    enforce_linear_history: true
+    require_signed_commits: true
+    required_approving_reviewers: 1
+    review_mode: single_maintainer
+    dismiss_stale_reviews: true
+register:
+  sources:
+    expected: 13
+    sha256:
+      sha256:bae7c17912f7d873769ddeae9dce1cf267e94eedd838228a219463bf5cb35efa
+    inputs:
+      - path: .paperclip/harness.json
+        surface: prompts
+        kind: message
+        format: json
+        selector: operating_contract.*
+      - path: .paperclip/harness.json
+        surface: prompts
+        kind: message
+        format: json
+        selector: invariants.*
+exceptions:
+  - rule: declared-linters
+    tool: gitleaks
+    reason: adoption scaffolds no CI job for gitleaks declared by facet "security:high"; run it in a workflow, or remove this entry
+    expires: "2027-02-20"
+    category: D
+  - rule: declared-linters
+    tool: semgrep
+    reason: adoption scaffolds no CI job for semgrep declared by profile "template-seed", facet "agent:sandboxed"; run it in a workflow, or remove this entry
+    expires: "2027-02-20"
+    category: D
+  - rule: declared-linters
+    tool: trivy
+    reason: adoption scaffolds no CI job for trivy declared by facet "security:high"; run it in a workflow, or remove this entry
+    expires: "2027-02-20"
+    category: D
+  - rule: HISS-11
+    path: .github/workflows/release.yml
+    reason: adoption found the release workflows short of the declared supply chain (SLSA Build Level 3 declared, Level 0 measured; enforce_cosign without a cosign signing step; require_sbom without an SBOM step); raise them as docs/guides/releasing.md in Praetor describes, then remove this entry
+    expires: "2027-02-20"
+    category: D
